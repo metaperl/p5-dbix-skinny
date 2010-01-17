@@ -10,6 +10,7 @@ use DBIx::Skinny::DBD;
 use DBIx::Skinny::Row;
 use DBIx::Skinny::Profiler;
 use DBIx::Skinny::Transaction;
+use DBIx::Skinny::SQL;
 use Digest::SHA1;
 use Carp ();
 use Storable;
@@ -248,44 +249,7 @@ sub resultset {
 sub search {
     my ($class, $table, $where, $opt) = @_;
 
-    my $cols = $opt->{select} || $class->schema->schema_info->{$table}->{columns};
-    my $rs = $class->resultset(
-        {
-            select => $cols,
-            from   => [$table],
-        }
-    );
-
-    if ( $where ) {
-        $rs->add_wheres($where);
-    }
-
-    $rs->limit(  $opt->{limit}  ) if $opt->{limit};
-    $rs->offset( $opt->{offset} ) if $opt->{offset};
-
-    if (my $terms = $opt->{order_by}) {
-        $terms = [$terms] unless ref($terms) eq 'ARRAY';
-        my @orders;
-        for my $term (@{$terms}) {
-            my ($col, $case);
-            if (ref($term) eq 'HASH') {
-                ($col, $case) = each %$term;
-            } else {
-                $col  = $term;
-                $case = 'ASC';
-            }
-            push @orders, { column => $col, desc => $case };
-        }
-        $rs->order(\@orders);
-    }
-
-    if (my $terms = $opt->{having}) {
-        for my $col (keys %$terms) {
-            $rs->add_having($col => $terms->{$col});
-        }
-    }
-
-    $rs->retrieve;
+    DBIx::Skinny::SQL->search($class, $table, $where, $opt);
 }
 
 sub single {
