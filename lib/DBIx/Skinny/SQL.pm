@@ -300,7 +300,11 @@ sub retrieve {
 }
 
 sub count {
-    my ($class, $skinny, $table, $column, $wheres) = @_;
+    my $class = shift;
+    if ( my $ref_class = ref $class ) {
+        return $ref_class->count($class->skinny, @_);
+    }
+    my ($skinny, $table, $column, $wheres) = @_;
     my $self = $class->new({ 
         skinny => $skinny,
         from   => [$table],
@@ -311,7 +315,11 @@ sub count {
 }
 
 sub search {
-    my ($class, $skinny, $table, $wheres, $opt) = @_;
+    my $class = shift;
+    if ( my $ref_class = ref $class ) {
+        return $ref_class->search($class->skinny, @_);
+    }
+    my ($skinny, $table, $wheres, $opt) = @_;
     my $cols = $opt->{select} || $skinny->schema->schema_info->{$table}->{columns};
     my $rs = $class->new({
         skinny => $skinny,
