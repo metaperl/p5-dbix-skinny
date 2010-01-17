@@ -327,12 +327,20 @@ sub search {
         from   => [$table],
     });
 
+    $rs->_set_search($wheres, $opt);
+
+    $rs->retrieve;
+}
+
+sub _set_search {
+    my ($self, $wheres, $opt) = @_;
+
     if ( $wheres ) {
-        $rs->add_wheres($wheres);
+        $self->add_wheres($wheres);
     }
 
-    $rs->limit(  $opt->{limit}  ) if $opt->{limit};
-    $rs->offset( $opt->{offset} ) if $opt->{offset};
+    $self->limit(  $opt->{limit}  ) if $opt->{limit};
+    $self->offset( $opt->{offset} ) if $opt->{offset};
 
     if (my $terms = $opt->{order_by}) {
         $terms = [$terms] unless ref($terms) eq 'ARRAY';
@@ -347,16 +355,14 @@ sub search {
             }
             push @orders, { column => $col, desc => $case };
         }
-        $rs->order(\@orders);
+        $self->order(\@orders);
     }
 
     if (my $terms = $opt->{having}) {
         for my $col (keys %$terms) {
-            $rs->add_having($col => $terms->{$col});
+            $self->add_having($col => $terms->{$col});
         }
     }
-
-    $rs->retrieve;
 }
 
 'base code from Data::ObjectDriver::SQL';
