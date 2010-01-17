@@ -235,16 +235,7 @@ sub do {
 sub count {
     my ($class, $table, $column, $where) = @_;
 
-    my $rs = $class->resultset(
-        {
-            from   => [$table],
-        }
-    );
-
-    $rs->add_select("COUNT($column)" =>  'cnt');
-    $class->_add_where($rs, $where);
-
-    $rs->retrieve->first->cnt;
+    return DBIx::Skinny::SQL->count($class, $table, $column, $where);
 }
 
 sub resultset {

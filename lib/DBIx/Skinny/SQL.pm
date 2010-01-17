@@ -159,6 +159,13 @@ sub add_where {
     $self->where_values->{$tcol} = $val;
 }
 
+sub add_wheres {
+    my ($self, $wheres) = @_;
+    for my $col (keys %{$wheres}) {
+        $self->add_where($col => $wheres->{$col});
+    }
+}
+
 sub add_complex_where {
     my $self = shift;
     my ($terms) = @_;
@@ -290,6 +297,17 @@ sub _add_index_hint {
 sub retrieve {
     my ($self, $table) = @_;
     $self->skinny->search_by_sql($self->as_sql, $self->bind, ($table || $self->from->[0]));
+}
+
+sub count {
+    my ($class, $skinny, $table, $column, $wheres) = @_;
+    my $self = $class->new({ 
+        skinny => $skinny,
+        from   => [$table],
+    });
+    $self->add_select("COUNT($column)" => 'cnt');
+    $self->add_wheres($wheres);
+    return $self->retrieve->first->cnt;
 }
 
 'base code from Data::ObjectDriver::SQL';
