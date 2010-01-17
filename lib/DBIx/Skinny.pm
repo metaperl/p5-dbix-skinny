@@ -10,7 +10,6 @@ use DBIx::Skinny::DBD;
 use DBIx::Skinny::Row;
 use DBIx::Skinny::Profiler;
 use DBIx::Skinny::Transaction;
-use DBIx::Skinny::SQL;
 use Digest::SHA1;
 use Carp ();
 use Storable;
@@ -235,7 +234,7 @@ sub do {
 sub count {
     my ($class, $table, $column, $where) = @_;
 
-    return DBIx::Skinny::SQL->count($class, $table, $column, $where);
+    $class->dbd->query_builder_class->count($class, $table, $column, $where);
 }
 
 sub resultset {
@@ -249,7 +248,7 @@ sub resultset {
 sub search {
     my ($class, $table, $where, $opt) = @_;
 
-    DBIx::Skinny::SQL->search($class, $table, $where, $opt);
+    $class->dbd->query_builder_class->search($class, $table, $where, $opt);
 }
 
 sub single {
