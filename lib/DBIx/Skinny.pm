@@ -52,7 +52,6 @@ sub import {
                 _get_sth_iterator _mk_row_class _camelize _mk_anon_row_class _guess_table_name
             insert bulk_insert create update delete find_or_create find_or_insert
             update_by_sql delete_by_sql
-                _add_where
             _execute _close_sth _stack_trace
             txn_scope txn_begin txn_rollback txn_commit txn_end
         /;
@@ -258,7 +257,7 @@ sub search {
     );
 
     if ( $where ) {
-        $class->_add_where($rs, $where);
+        $rs->add_wheres($where);
     }
 
     $rs->limit(  $opt->{limit}  ) if $opt->{limit};
@@ -492,7 +491,7 @@ sub update {
     }
 
     my $stmt = $class->resultset;
-    $class->_add_where($stmt, $where);
+    $stmt->add_wheres($where);
     push @bind, @{ $stmt->bind };
 
     my $sql = "UPDATE $table SET " . join(', ', @set) . ' ' . $stmt->as_sql_where;
@@ -530,7 +529,7 @@ sub delete {
         }
     );
 
-    $class->_add_where($stmt, $where);
+    $stmt->add_wheres($where);
 
     my $sql = "DELETE " . $stmt->as_sql;
     $class->profiler($sql, $stmt->bind);
@@ -561,13 +560,6 @@ sub find_or_create {
     return $row if $row;
     $row = $class->insert($table, $args);
     return $row;
-}
-
-sub _add_where {
-    my ($class, $stmt, $where) = @_;
-    for my $col (keys %{$where}) {
-        $stmt->add_where($col => $where->{$col});
-    }
 }
 
 sub _execute {
