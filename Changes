@@ -1,7 +1,7 @@
 Revision history for Perl extension DBIx::Skinny
 
 0.06
-   XXXX-XX-XX
+   2010-02-07
         - FIXED: _guess_table_name bug.
         - MOD: utf8_on/utf8_off speed up. (thanks tokuhirom)
         - MOD: direct call caller. (thanks yappo)
@@ -9,6 +9,8 @@ Revision history for Perl extension DBIx::Skinny
         - FIXED: (connecton|do) error handling (thanks walf443)
         - ADD: some documents
         - MOD: specific your query profiler (thanks walf443)
+        - FIXED: error processing when Schema.pm doesn't exist (thanks walf443)
+        - MOD: it came to be able to define original Row.pm
 
 0.05
    2009-12-21

@@ -320,7 +320,14 @@ sub search {
         return $ref_class->search($class->skinny, @_);
     }
     my ($skinny, $table, $wheres, $opt) = @_;
-    my $cols = $opt->{select} || $skinny->schema->schema_info->{$table}->{columns};
+    my $cols = $opt->{select};
+    unless ($cols) {
+        my $column_info = $skinny->schema->schema_info->{$table};
+        unless ( $column_info ) {
+            Carp::croak("schema_info is not exist for table $table");
+        }
+        $cols = $column_info->{columns};
+    }
     my $rs = $class->new({
         skinny => $skinny,
         select => $cols,
